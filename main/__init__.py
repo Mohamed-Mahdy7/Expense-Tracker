@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from config import Config
@@ -16,7 +16,7 @@ def create_app():
     
     @app.route("/")
     def hello():
-        return "Working..."
+        return render_template("home.html")
     
     from auth import auth as auth_blueprint
     
