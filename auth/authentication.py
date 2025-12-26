@@ -1,8 +1,9 @@
-from flask import jsonify, current_app, redirect, render_template, request
-from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies
+from flask import jsonify, current_app, make_response, redirect, render_template, request
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from main.models import Users, db
 from datetime import datetime, timezone
+
 
 def register():
     """Register users"""
@@ -78,10 +79,14 @@ def login():
             response = redirect("/home")
             
             # Set Cookies
-            set_access_cookies(response, access_token)
             response.set_cookie(
-                key="refresh_token_cookie",
-                value=refresh_token,
+                "access_token_cookie", access_token,
+                httponly=True,
+                secure=False,
+                samesite="Lax",
+            )
+            response.set_cookie(
+                "refresh_token_cookie", refresh_token,
                 httponly=True,
                 samesite="Lax",
                 secure=False
@@ -94,3 +99,40 @@ def login():
             
     else:
         return render_template("login.html")
+
+
+@jwt_required(refresh=True)
+def refresh():
+    """refresh cookies"""
+    identity = get_jwt_identity()
+    new_access_token = create_access_token(identity=identity)
+    
+    response = make_response(jsonify({
+        "message": "Token Refreshed!",
+        "access_token_cookie": new_access_token
+    }), 201)
+    
+    response.set_cookie(
+        "access_token_cookie", new_access_token,
+        httponly=True,
+        secure=False,
+        samesite="Lax",
+    )
+    return response
+
+
+@jwt_required()
+def logout():
+    response = make_response(jsonify({"message": "Logged out successfully!"}), 200)
+    response.set_cookie(
+        "access_token", "",
+        expires=0, 
+        httponly=True, 
+        samesite="Lax"
+        )
+    response.set_cookie(
+        "refresh_token", "",
+        expires=0, 
+        httponly=True, 
+        samesite="Lax")
+    return response
