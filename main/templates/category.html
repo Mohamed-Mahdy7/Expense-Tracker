@@ -1,0 +1,43 @@
+{%extends "index.html"%}
+
+{%block title%}
+    Categories
+{%endblock%}
+
+{%block body%}
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Add New Categories</h2>
+
+        <!-- Transaction Form -->
+        <form method="POST" action="/categories">
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <input type="text" class="form-control" id="category" name="name">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Category</button>
+        </form>
+
+        <hr class="my-5">
+
+        <!-- Transaction List -->
+        <h2 class="mb-4">Your Categories</h2>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in categories %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{%endblock%}

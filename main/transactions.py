@@ -8,7 +8,7 @@ from . import db
 def add_transaction():
     """POST to transactions records"""
     data = request.form.to_dict()
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     
     new_transaction = Transactions(
         user_id=user_id,
@@ -26,7 +26,7 @@ def add_transaction():
 
 def get_transaction():
     """GET transaction records"""
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     categories = Categories.query.all()
     transactions = Transactions.query.filter_by(user_id=user_id).order_by(
         Transactions.date.desc()).all()
