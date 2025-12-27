@@ -19,7 +19,7 @@ def dashboard():
         year = request.args.get("year", str(now.year))
     
     #Total income
-    income = db.session.query(db.func.coalesce(
+    income = db.session.query(func.coalesce(
         db.func.sum(Transactions.amount), 0)).filter(
         Transactions.user_id==user_id,
         Transactions.transaction_type=="income",
@@ -28,7 +28,7 @@ def dashboard():
         ).scalar()
     
     #Total expenses
-    expenses = db.session.query(db.func.coalesce(
+    expenses = db.session.query(func.coalesce(
         db.func.sum(Transactions.amount), 0)).filter(
         Transactions.user_id==user_id,
         Transactions.transaction_type=="expense",
@@ -39,11 +39,12 @@ def dashboard():
     balance = income - expenses
     
     #Pie chart
-    
     category_data = db.session.query(
         Categories.name,
         func.coalesce(func.sum(Transactions.amount), 0).label("total")
-        ).join(Transactions, Categories.id==Transactions.category_id).filter(
+        ).join(
+            Transactions, Categories.id==Transactions.category_id
+        ).filter(
         Transactions.user_id==user_id,
         Transactions.transaction_type=="expense",
         cast(func.strftime('%m', Transactions.date), Integer) == month,
@@ -51,8 +52,8 @@ def dashboard():
     ).group_by(Categories.name).all()
     
     
-    labels = [row["name"] for row in category_data]
-    values = [row["total"] for row in category_data]
+    labels = [row[0] for row in category_data]
+    values = [row[1] for row in category_data]
     
     return render_template(
         "dashboard.html",

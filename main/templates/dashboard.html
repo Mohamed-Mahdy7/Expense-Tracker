@@ -5,55 +5,77 @@
 {%endblock%} 
 
 {%block body%}
-
+    <nav class="bg-light border navbar navbar-expand-md navbar-light">
+        <h1>Dashboard</h1>
+        <div class="container-fluid">
+            <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto mt-2">
+                    <li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/categories">Categories</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <header>
-            <h1>Dashboard</h1>
-            <a href="{{url_for('main.transaction_details')}}" class="btn btn-primary">Transactions</a>
-            <a href="{{url_for('main.category_details')}}" class="btn btn-primary">Categories</a>
         </header>
 
-    <!-- Filters -->
-    <div class="filters">
-        <div class="filter">
-        <form method="get">
-            <label for="month">Select Month</label> 
-            <input type="month" name="month" id="month" value="{{ request.args.get('month', '') }}">
-            <button type="submit">Filter</button>
-        </form>
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter">
+                <form method="get" class="filter-form">
+                    <label for="month">Select Month</label>
+                    <div class="filter-row">
+                        <input type="month" name="month" id="month" 
+                                value="{{ request.args.get('month', '') }}">
+                        <button type="submit">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Total Income</h3>
+                <p>{{ income }}$</p>
+            </div>
+        
+            <div class="card">
+                    <h3>Total Expenses</h3>
+                <p>{{ expenses }}$</p>
+            </div>
+        
+            <div class="card">
+                <h3>Balance</h3>
+                <p>{{ balance }}$</p>
+            </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts">
+            <div class="pieChart">
+                <h3>Expenses by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+        
+            <div class="barChart">
+                <h3>Income vs Expenses</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+        <div 
+            id="chart-data"
+            data-labels='{{ labels | tojson }}'
+            data-values='{{ values | tojson }}'
+            data-income='{{ income }}'
+            data-expenses='{{ expenses }}'>
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="cards">
-        <div class="card">
-        <h3>Total Income</h3>
-        <p>{{ income }}$</p>
-        </div>
-
-        <div class="card">
-        <h3>Total Expenses</h3>
-        <p>{{ expenses }}$</p>
-        </div>
-
-        <div class="card">
-        <h3>Balance</h3>
-        <p>{{ balance }}$</p>
-        </div>
-    </div>
-
-    <!-- Charts -->
-    <div class="charts">
-        <div>
-        <h3>Expenses by Category</h3>
-        <canvas id="categoryChart"></canvas>
-        </div>
-
-        <div>
-        <h3>Income vs Expenses</h3>
-        <canvas id="barChart"></canvas>
-        </div>
-    </div>
-    </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{url_for('static', filename='js/charts.js')}}"></script>
 {%endblock%}

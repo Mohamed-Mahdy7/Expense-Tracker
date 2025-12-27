@@ -10,6 +10,8 @@ class Users(db.Model):
     email = db.Column(db.Text, unique=True, nullable=False)
     hash = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime)
+    users = db.relationship("Transactions", back_populates="user")
+
 
 
 class Categories(db.Model):
@@ -17,6 +19,7 @@ class Categories(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, ForeignKey("users.id"))
+    transactions = db.relationship("Transactions", back_populates="category")
 
 
 class Transactions(db.Model):
@@ -28,8 +31,8 @@ class Transactions(db.Model):
     description = db.Column(db.Text)
     date = db.Column(db.Text)
     transaction_type = db.Column(db.Text)
-    # user = db.relationship("users", back_populates="transactions")
-    # category = db.relationship("categories", back_populates="transactions")
+    user = db.relationship("Users", back_populates="users")
+    category = db.relationship("Categories", back_populates="transactions")
     
     __table_args__ = (
         CheckConstraint(

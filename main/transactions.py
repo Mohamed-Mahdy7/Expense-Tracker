@@ -1,5 +1,5 @@
 """Transactions Operaitons"""
-from flask import redirect, render_template, request
+from flask import current_app, redirect, render_template, request
 from flask_jwt_extended import get_jwt_identity
 from sqlalchemy import text
 from main.models import Categories, Transactions
@@ -20,8 +20,12 @@ def add_transaction():
     )
     db.session.add(new_transaction)
     db.session.commit()
+    current_app.logger.info("New Transaction Addes Successfully")
     
-    return redirect("/dashboard")
+    transactions = db.session.query(Transactions).filter_by(
+        user_id=user_id).order_by(Transactions.date.desc()).all()
+    
+    return render_template("transaction.html", transactions=transactions)
 
 
 def get_transaction():
