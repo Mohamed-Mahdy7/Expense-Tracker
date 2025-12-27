@@ -25,9 +25,11 @@ class Transactions(db.Model):
     user_id = db.Column(db.Integer, ForeignKey("users.id"))
     category_id = db.Column(db.Integer, ForeignKey("categories.id"))
     amount = db.Column(db.Float)
-    describtion = db.Column(db.Text)
+    description = db.Column(db.Text)
     date = db.Column(db.Text)
     transaction_type = db.Column(db.Text)
+    # user = db.relationship("users", back_populates="transactions")
+    # category = db.relationship("categories", back_populates="transactions")
     
     __table_args__ = (
         CheckConstraint(

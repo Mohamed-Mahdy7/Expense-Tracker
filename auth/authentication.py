@@ -76,7 +76,7 @@ def login():
                 additional_claims=additional_claims
                 )
             
-            response = redirect("/home")
+            response = redirect("/dashboard")
             
             # Set Cookies
             response.set_cookie(
