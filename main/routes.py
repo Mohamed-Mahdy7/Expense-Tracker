@@ -3,7 +3,8 @@ from flask_jwt_extended import jwt_required
 import jwt
 from . import main
 from .dashboard import dashboard
-from .transactions import add_transaction, get_transaction
+from .transactions import add_transaction, get_transaction, update_transaction,\
+    delete_transaction, get_one_transaction
 from .categories import add_category, get_category
 
 
@@ -24,6 +25,17 @@ def transaction_details():
         return add_transaction()
     else:
         return get_transaction()
+
+
+@main.route("/transaction/<int:id>", methods=["GET", "POST", "DELETE"])
+@jwt_required()
+def transaction_edit(id):
+    if request.method == "POST" and request.form.get("_method") == "PUT":
+        return update_transaction(id)
+    elif request.method == "DELETE":
+        return delete_transaction(id)
+    else:
+        return get_one_transaction(id)
 
 
 @main.route("/categories", methods=["GET", "POST"])

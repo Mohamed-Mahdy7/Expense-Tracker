@@ -15,6 +15,7 @@ def add_category():
     
     new_category = Categories(
         name = name,
+        price = data['price'],
         user_id = user_id
     )
     db.session.add(new_category)

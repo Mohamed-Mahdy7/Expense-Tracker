@@ -18,6 +18,7 @@ class Categories(db.Model):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
+    price = db.Column(db.Float)
     user_id = db.Column(db.Integer, ForeignKey("users.id"))
     transactions = db.relationship("Transactions", back_populates="category")
 
@@ -28,8 +29,9 @@ class Transactions(db.Model):
     user_id = db.Column(db.Integer, ForeignKey("users.id"))
     category_id = db.Column(db.Integer, ForeignKey("categories.id"))
     amount = db.Column(db.Float)
+    total = db.Column(db.Float)
     description = db.Column(db.Text)
-    date = db.Column(db.Text)
+    date = db.Column(db.Date)
     transaction_type = db.Column(db.Text)
     user = db.relationship("Users", back_populates="users")
     category = db.relationship("Categories", back_populates="transactions")

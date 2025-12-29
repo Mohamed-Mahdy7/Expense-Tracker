@@ -20,7 +20,7 @@ def dashboard():
     
     #Total income
     income = db.session.query(func.coalesce(
-        db.func.sum(Transactions.amount), 0)).filter(
+        db.func.sum(Transactions.total), 0)).filter(
         Transactions.user_id==user_id,
         Transactions.transaction_type=="income",
         cast(func.strftime('%Y', Transactions.date), Integer) == year,
@@ -29,7 +29,7 @@ def dashboard():
     
     #Total expenses
     expenses = db.session.query(func.coalesce(
-        db.func.sum(Transactions.amount), 0)).filter(
+        db.func.sum(Transactions.total), 0)).filter(
         Transactions.user_id==user_id,
         Transactions.transaction_type=="expense",
         cast(func.strftime('%m', Transactions.date), Integer) == month,
