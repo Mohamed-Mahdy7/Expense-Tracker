@@ -27,12 +27,12 @@ def transaction_details():
         return get_transaction()
 
 
-@main.route("/transaction/<int:id>", methods=["GET", "POST", "DELETE"])
+@main.route("/transaction/<int:id>", methods=["GET", "POST", "PUT", "DELETE"])
 @jwt_required()
 def transaction_edit(id):
     if request.method == "POST" and request.form.get("_method") == "PUT":
         return update_transaction(id)
-    elif request.method == "DELETE":
+    elif request.method == "POST" and request.form.get("_method") == "DELETE":
         return delete_transaction(id)
     else:
         return get_one_transaction(id)

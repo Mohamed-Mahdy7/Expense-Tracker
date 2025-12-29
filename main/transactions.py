@@ -86,9 +86,6 @@ def update_transaction(id):
         )
         return redirect(url_for("main.transaction_details"))
     
-    data_fields = ["category_id", "amount", "price", 
-                    "description", "date", "transaction_type"]
-    
     try:
         if "category_id" in data:
             transaction.category_id = int(data["category_id"])
@@ -109,8 +106,8 @@ def update_transaction(id):
         transaction.total = transaction.amount * category.price
             
         db.session.commit()
-        current_app.logger.info("Transaction Updated Successfully!")
-        return get_transaction()
+        current_app.logger.info("\nTransaction Updated Successfully!\n")
+        return  redirect(url_for("main.transaction_details"))
     
     except Exception as e:
         db.session.rollback()
@@ -129,12 +126,12 @@ def delete_transaction(id):
         current_app.logger.warning(
             f"Unauthorized delete attempt by user {user_id} on transaction {id}"
         )
-        return redirect(url_for("main.transaction_details"))
+        abort(403)
     
     try:
         db.session.delete(transaction)
         db.session.commit()
-        current_app.logger.info(f"Transaction {id} deleted successfully")
+        current_app.logger.info(f"\nTransaction {id} deleted successfully\n")
         return redirect(url_for("main.transaction_details"))
         
     except Exception as e:
