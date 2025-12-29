@@ -46,6 +46,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Price</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -53,6 +54,23 @@
                 <tr>
                     <td>{{ c.name }}</td>
                     <td>{{ c.price }}</td>
+                    <td>
+                        <!-- update -->
+                        <a href="{{ url_for('main.category_edit', id=c.id)}}"
+                            class="btn btn-sm btn-warning">
+                            Edit
+                        </a>
+
+                        <form method="post" action="{{ url_for('main.category_edit', id=c.id) }}"
+                            style="display:inline;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Are you sure? This transaction will be deleted!');">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

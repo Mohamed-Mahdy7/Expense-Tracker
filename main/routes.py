@@ -5,7 +5,7 @@ from . import main
 from .dashboard import dashboard
 from .transactions import add_transaction, get_transaction, update_transaction,\
     delete_transaction, get_one_transaction
-from .categories import add_category, get_category
+from .categories import add_category, delete_category, get_category, get_one_category, update_category
 
 
 @main.route("/home")
@@ -46,3 +46,13 @@ def category_details():
     else:
         return get_category()
 
+
+@main.route("/categories/<int:id>", methods=["GET", "POST", "PUT", "DELETE"])
+@jwt_required()
+def category_edit(id):
+    if request.method == "POST" and request.form.get("_method") == "PUT":
+        return update_category(id)
+    elif request.method == "POST" and request.form.get("_method") == "DELETE":
+        return delete_category(id)
+    else:
+        return get_one_category(id)
