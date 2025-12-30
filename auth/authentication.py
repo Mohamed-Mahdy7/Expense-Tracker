@@ -14,9 +14,23 @@ def register():
             confirm_password = data.get("confirm_password")
             
             if hash != confirm_password:
-                return jsonify({
-                    "error": "Password and Confirmation Password not the same!"
-                    }), 400
+                return render_template(
+                "error.html", 
+                title = "Register Error",
+                error="Password and Confirmation Password not the same!",
+                back_url=url_for("auth.register_"))
+            
+            new_user = data.get("username")
+            existing_user = db.session.query(Users).filter(
+                Users.username==new_user).first()
+            
+            if existing_user:
+                return render_template(
+                "error.html", 
+                title = "Register Error",
+                error="username already exists",
+                back_url=url_for("auth.register_"))
+                
             hash_password = generate_password_hash(hash)
             
             new_user = Users(
@@ -32,8 +46,11 @@ def register():
             return redirect("/login")
         except Exception as e:
             current_app.logger.error(f"Error Registering!: {str(e)}")
-            return jsonify({"error": "Error Registering!",
-                            "details": str(e)}), 500
+            return render_template(
+                "error.html", 
+                title = "Register Error",
+                error= str(e),
+                back_url=url_for("auth.register_"))
     
     else:
         return render_template("register.html")
