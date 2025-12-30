@@ -1,10 +1,7 @@
 """Transactions Operaitons"""
 from datetime import datetime
-from http.client import TOO_EARLY
-from sre_constants import CATEGORY_UNI_DIGIT
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask_jwt_extended import get_jwt_identity
-from sqlalchemy import text
 from main.models import Categories, Transactions
 from . import db
 
@@ -31,13 +28,16 @@ def add_transaction():
         db.session.add(new_transaction)
         db.session.commit()
         current_app.logger.info("New Transaction Addes Successfully")
+        return redirect(url_for("main.transaction_details"))
+    
     except Exception as e:
         current_app.logger.error(f"Error adding new Transaction: {str(e)}")
         return render_template(
-            "transaction.html", 
-            error=f"Error adding new Transaction: {str(e)}")
-    
-    return get_transaction()
+                "error.html", 
+                title="Add transaction Failed",
+                error=f"Can't Add transaction",
+                details = str(e),
+                back_url=url_for("main.transaction_details"))
 
 
 def get_transaction():
@@ -64,9 +64,7 @@ def get_one_transaction(id):
         current_app.logger.warning(
             f"Unauthorized get attempt by user {user_id} on transaction {id}"
         )
-        return redirect(url_for(
-            "main.transaction_details", 
-            error=f"Unauthorized get attempt by user {user_id} on transaction {id}"))
+        abort(403)
     
     return render_template(
         "transaction_edit.html", 
@@ -84,7 +82,7 @@ def update_transaction(id):
         current_app.logger.warning(
             f"Unauthorized update attempt by user {user_id} on transaction {id}"
         )
-        return redirect(url_for("main.transaction_details"))
+        abort(403)
     
     try:
         if "category_id" in data:
@@ -113,8 +111,11 @@ def update_transaction(id):
         db.session.rollback()
         current_app.logger.error(f"Error Updating Transaction: {str(e)}")
         return render_template(
-            "transaction.html", 
-            error=f"Error Updating Transaction: {str(e)}")
+                "error.html", 
+                title="Update transaction Failed",
+                error=f"Can't Update transaction",
+                details = str(e),
+                back_url=url_for("main.transaction_edit"))
 
 
 def delete_transaction(id):
@@ -137,4 +138,9 @@ def delete_transaction(id):
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Error deleting transaction {id}: {str(e)}")
-        return redirect(url_for("main.transaction_details", error=f"Error Deleting transaction: {str(e)}"))
+        return render_template(
+                "error.html", 
+                title="Delete transaction Failed",
+                error=f"Can't Delete transaction",
+                details = str(e),
+                back_url=url_for("main.transaction_edit"))

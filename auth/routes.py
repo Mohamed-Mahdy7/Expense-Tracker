@@ -10,7 +10,7 @@ def login_():
 def register_():
     return register()
 
-@auth.route("/logout", methods=["POST"])
+@auth.route("/logout", methods=["GET", "POST"])
 def logout_():
     return logout()
 

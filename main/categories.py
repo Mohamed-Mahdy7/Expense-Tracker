@@ -1,5 +1,4 @@
 """Category Operations"""
-from http.client import TOO_EARLY
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask_jwt_extended import get_jwt_identity
 from main.models import Categories
@@ -14,20 +13,30 @@ def add_category():
     if not name:
         return render_template("category.html", error="Category name cannot be empty")
     
-    new_category = Categories(
-        name = name,
-        price = data['price'],
-        user_id = user_id
-    )
-    db.session.add(new_category)
-    db.session.commit()
-    
-    current_app.logger.info(f"New Category Added Successfully: {new_category.name}")
-    # Fetch updated categories list
-    categories = db.session.query(Categories).filter_by(
-        user_id=user_id).order_by(Categories.name).all()
-    
-    return render_template("category.html", categories=categories)
+    try:
+        new_category = Categories(
+            name = name,
+            price = data['price'],
+            user_id = user_id
+        )
+        db.session.add(new_category)
+        db.session.commit()
+        
+        current_app.logger.info(f"New Category Added Successfully: {new_category.name}")
+        # Fetch updated categories list
+        categories = db.session.query(Categories).filter_by(
+            user_id=user_id).order_by(Categories.name).all()
+        
+        return render_template("category.html", categories=categories)
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"error adding new category: {str(e)}")
+        return render_template(
+                "error.html", 
+                title="Add Category Failed",
+                error=f"Can't Add category",
+                details = str(e),
+                back_url=url_for("main.category_details"))
 
 
 def get_category():
@@ -80,13 +89,17 @@ def update_category(id):
         db.session.rollback()
         current_app.logger.error(f"Error Updating category: {str(e)}")
         return render_template(
-            "category.html", 
-            error=f"Error Updating category: {str(e)}")
+                "error.html", 
+                title="Update Category Failed",
+                error=f"Can't Update category",
+                details = str(e),
+                back_url=url_for("main.category_edit"))
 
 
 def delete_category(id):
     """Delete category record"""
     category = Categories.query.get_or_404(id)
+    related_transactions = category.transactions
     user_id = int(get_jwt_identity())
     
     if category.user_id != user_id:
@@ -96,6 +109,16 @@ def delete_category(id):
         abort(403)
     
     try:
+        if related_transactions:
+            current_app.logger.error(
+                f"Can't delete category associated with transactions, Delete transactions first")
+            return render_template(
+                "error.html", 
+                title="Delete Category Failed",
+                error=f"Can't delete category associated with transactions, Delete transactions first",
+                back_url=url_for("main.category_details"))
+            
+            
         db.session.delete(category)
         db.session.commit()
         current_app.logger.info(f"\ncategory {id} deleted successfully\n")
@@ -104,4 +127,8 @@ def delete_category(id):
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Error deleting category {id}: {str(e)}")
-        return redirect(url_for("main.category_details", error=f"Error Deleting category: {str(e)}"))
+        return render_template(
+                "error.html", 
+                title="Delete Category Failed",
+                error=f"Can't delete category associated with transactions, Delete transactions first",
+                back_url=url_for("main.category_details"))

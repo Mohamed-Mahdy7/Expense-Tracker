@@ -1,27 +1,10 @@
 {% extends "index.html" %}
 
-{% block title %}
-    Transaction
-{% endblock %}
+{% block title %} Transaction {% endblock %}
+
+{%block header%} Edit Transaction {%endblock%}
 
 {% block body %}
-    <nav class="bg-light border navbar navbar-expand-md navbar-light">
-        <h1 style=
-            "width: 100%;
-            text-align: left;">Edit Transaciton
-        </h1>
-        <div class="container-fluid">
-            <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbar">
-                <ul class="navbar-nav ms-auto mt-2">
-                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/categories">Categories</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
     <div class="container mt-4">
         {% if error %}

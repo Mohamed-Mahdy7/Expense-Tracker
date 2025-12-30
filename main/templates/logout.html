@@ -1,0 +1,34 @@
+{%extends "index.html"%}
+
+{%block title%} Logout {%endblock%}
+
+{%block header%} Logout {%endblock%}
+
+{%block body%}
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-warning">
+                    <div class="card-header bg-warning text-white">
+                        <strong>Logout</strong>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">{{ message }}</p>
+                        
+                        <form action="{{ url_for('auth.logout_') }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-warning">
+                                Logout
+                            </button>
+                        </form>
+                        
+                        <a href="{{ back_url }}" class="btn btn-outline-success">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

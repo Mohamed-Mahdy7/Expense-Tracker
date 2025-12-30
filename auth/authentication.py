@@ -1,4 +1,4 @@
-from flask import jsonify, current_app, make_response, redirect, render_template, request
+from flask import flash, jsonify, current_app, make_response, redirect, render_template, request, url_for
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from main.models import Users, db
@@ -45,7 +45,11 @@ def login():
         data = request.form.to_dict()
         if not data or not data.get("username") or not data.get("password"):
             current_app.logger.error("Invalid input: username and password required!")
-            return jsonify({"error": "Invalid input: username and password required!"}), 400
+            return render_template(
+                "error.html", 
+                title = "Invalid input",
+                error="username and password required!",
+                back_url=url_for("auth.login_"))
         
         username = data.get("username").strip()
         password = data.get("password").strip()
@@ -54,10 +58,20 @@ def login():
         user = db.session.query(Users).filter(Users.username==username).first()
         if not user:
             current_app.logger.error("User Not Found")
-            return jsonify({"error": ""}), 404
+            return render_template(
+                "error.html", 
+                title = "Login Error",
+                error="User Not Fount",
+                back_url=url_for("auth.login_"))
         
         hash_password = user.hash
         checked_password = check_password_hash(hash_password, password)
+        if not checked_password:
+            return render_template(
+                "error.html", 
+                title = "Login Error",
+                error="incorrect usename or password",
+                back_url=url_for("auth.login_"))
         
         try:
             hash_password = user.hash
@@ -94,8 +108,11 @@ def login():
             return response
         except Exception as e:
             current_app.logger.error(f"Error Logging in: {str(e)}")
-            return jsonify({"error": "Error Logging in",
-                            "detials": str(e)}), 500
+            return render_template(
+                "error.html", 
+                title = "Login error",
+                error=str(e),
+                back_url=url_for("auth.login_"))
             
     else:
         return render_template("login.html")
@@ -123,16 +140,23 @@ def refresh():
 
 @jwt_required()
 def logout():
-    response = make_response(jsonify({"message": "Logged out successfully!"}), 200)
-    response.set_cookie(
-        "access_token", "",
-        expires=0, 
-        httponly=True, 
-        samesite="Lax"
-        )
-    response.set_cookie(
-        "refresh_token", "",
-        expires=0, 
-        httponly=True, 
-        samesite="Lax")
-    return response
+    if request.method == "POST":
+        flash("Logged out successfully", "info")
+        response = redirect(url_for('hello'))
+        response.set_cookie(
+            "access_token", "",
+            expires=0, 
+            httponly=True, 
+            samesite="Lax"
+            )
+        response.set_cookie(
+            "refresh_token", "",
+            expires=0, 
+            httponly=True, 
+            samesite="Lax")
+        return response
+    else:
+        return render_template(
+                "logout.html", 
+                message=f"Are you sure you want to logout?",
+                back_url=url_for("main.dashboard_"))
