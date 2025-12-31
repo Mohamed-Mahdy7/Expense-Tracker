@@ -13,15 +13,15 @@
 
         <form method="post" action="{{ url_for('main.transaction_edit', id=transaction.id) }}">
             <input type="hidden" name="_method" value="PUT">
-            <!-- Category -->
+            <!-- item -->
             <div class="mb-3">
-                <label class="form-label">Category</label>
-                <select name="category_id" title="category" id="category_id" class="form-select" required>
-                    {% for cat in categories %}
+                <label class="form-label">Item</label>
+                <select name="item_id" title="item" id="item_id" class="form-select" required>
+                    {% for cat in items %}
                         <option
                             value="{{ cat.id }}"
                             data-price="{{ cat.price }}"
-                            {% if cat.id == transaction.category_id %}selected{% endif %}
+                            {% if cat.id == transaction.item_id %}selected{% endif %}
                         >
                             {{ cat.name }}
                         </option>

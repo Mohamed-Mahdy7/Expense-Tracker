@@ -1,7 +1,7 @@
-h1{
+h1 {
   margin: 24px auto;
   text-align: center;
-  }
+}
 .filters {
   display: flex;
   gap: 16px;
@@ -57,14 +57,14 @@ h1{
   font-size: 1.3rem;
 }
 .charts {
-    display: flex;
-    align-items: stretch;
-    justify-content: space-between;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
 }
 .pieChart {
   width: 33%;
 }
-#categoryChart {
+#itemChart {
   display: block;
   box-sizing: border-box;
   width: 164.6px;

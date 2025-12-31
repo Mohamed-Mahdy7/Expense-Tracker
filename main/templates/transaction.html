@@ -1,109 +1,132 @@
-{%extends "index.html"%}
+{%extends "index.html"%} {%block title%} Transactions {%endblock%} {%block
+header%} Transactions {%endblock%} {%block body%}
 
-{%block title%} Transactions {%endblock%}
+<div class="container mt-5">
+  <h2 class="mb-4">Add New Transaction</h2>
 
-{%block header%} Transactions {%endblock%}
-
-{%block body%}
-
-    <div class="container mt-5">
-        <h2 class="mb-4">Add New Transaction</h2>
-
-        <!-- Transaction Form -->
-        <form method="POST" action="/transactions">
-            <div class="mb-3">
-                <label for="category_id" class="form-label">Category</label>
-                <select class="form-select" name="category_id" id="category_id" required>
-                    {% for category in categories %}
-                        <option 
-                            value="{{ category.id }}"
-                            data-price="{{ category.price}}"
-                        >
-                            {{ category.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="amount" class="form-label">Amount</label>
-                <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="price" class="form-label">Price</label>
-                <input type="number" step="0.01" class="form-control readonly-input" id="price" name="price" readonly>
-            </div>
-            
-            <div class="mb-3">
-                <label for="transaction_type" class="form-label">Type</label>
-                <select class="form-select" name="transaction_type" id="transaction_type" required>
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
-                </select>
-            </div>
-            
-            <div class="mb-3">
-                <label for="date" class="form-label">Date</label>
-                <input type="date" class="form-control" id="date" name="date" required>
-            </div>
-            
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <input type="text" class="form-control" id="description" name="description">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Add Transaction</button>
-        </form>
-
-        <hr class="my-5">
-
-        <!-- Transaction List -->
-        <h2 class="mb-4">Your Transactions</h2>
-
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Category</th>
-                    <th>Amount</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in transactions %}
-                <tr>
-                    <td>{{ t.date }}</td>
-                    <td>{{ t.category.name }}</td>
-                    <td>{{ t.amount }}</td>
-                    <td>{{ t.category.price }}</td>
-                    <td>{{ t.total }}</td>
-                    <td>{{ t.transaction_type }}</td>
-                    <td>{{ t.description }}</td>
-                    <td>
-                        <!-- update -->
-                        <a href="{{ url_for('main.transaction_edit', id=t.id)}}"
-                            class="btn btn-sm btn-warning">
-                            Edit
-                        </a>
-
-                        <form method="post" action="{{ url_for('main.transaction_edit', id=t.id) }}"
-                            style="display:inline;">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit"
-                                    class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Are you sure? This transaction will be deleted!');">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+  <!-- Transaction Form -->
+  <form method="POST" action="/transactions">
+    <div class="mb-3">
+      <label for="item_id" class="form-label">Item</label>
+      <select class="form-select" name="item_id" id="item_id" required>
+        {% for item in items %}
+        <option value="{{ item.id }}" data-price="{{ item.price}}">
+          {{ item.name }}
+        </option>
+        {% endfor %}
+      </select>
     </div>
+
+    <div class="mb-3">
+      <label for="amount" class="form-label">Amount</label>
+      <input
+        type="number"
+        step="0.01"
+        class="form-control"
+        id="amount"
+        name="amount"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="price" class="form-label">Price</label>
+      <input
+        type="number"
+        step="0.01"
+        class="form-control readonly-input"
+        id="price"
+        name="price"
+        readonly
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="transaction_type" class="form-label">Type</label>
+      <select
+        class="form-select"
+        name="transaction_type"
+        id="transaction_type"
+        required
+      >
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="date" class="form-label">Date</label>
+      <input type="date" class="form-control" id="date" name="date" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <input
+        type="text"
+        class="form-control"
+        id="description"
+        name="description"
+      />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Transaction</button>
+  </form>
+
+  <hr class="my-5" />
+
+  <!-- Transaction List -->
+  <h2 class="mb-4">Your Transactions</h2>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>item</th>
+        <th>Amount</th>
+        <th>Price</th>
+        <th>Total</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transactions %}
+      <tr>
+        <td>{{ t.date }}</td>
+        <td>{{ t.item.name }}</td>
+        <td>{{ t.amount }}</td>
+        <td>{{ t.item.price }}</td>
+        <td>{{ t.total }}</td>
+        <td>{{ t.transaction_type }}</td>
+        <td>{{ t.description }}</td>
+        <td>
+          <!-- update -->
+          <a
+            href="{{ url_for('main.transaction_edit', id=t.id)}}"
+            class="btn btn-sm btn-warning"
+          >
+            Edit
+          </a>
+
+          <form
+            method="post"
+            action="{{ url_for('main.transaction_edit', id=t.id) }}"
+            style="display: inline"
+          >
+            <input type="hidden" name="_method" value="DELETE" />
+            <button
+              type="submit"
+              class="btn btn-sm btn-danger"
+              onclick="return confirm('Are you sure? This transaction will be deleted!');"
+            >
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {%endblock%}

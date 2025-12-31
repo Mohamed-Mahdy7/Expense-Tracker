@@ -13,29 +13,28 @@ class Users(db.Model):
     users = db.relationship("Transactions", back_populates="user")
 
 
-
-class Categories(db.Model):
-    __tablename__ = "categories"
+class Items(db.Model):
+    __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float)
     user_id = db.Column(db.Integer, ForeignKey("users.id"))
-    transactions = db.relationship("Transactions", back_populates="category")
+    transactions = db.relationship("Transactions", back_populates="item")
 
 
 class Transactions(db.Model):
     __tablename__ = "transactions"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey("users.id"))
-    category_id = db.Column(db.Integer, ForeignKey("categories.id"))
+    item_id = db.Column(db.Integer, ForeignKey("items.id"))
     amount = db.Column(db.Float)
     total = db.Column(db.Float)
     description = db.Column(db.Text)
     date = db.Column(db.Date)
     transaction_type = db.Column(db.Text)
     user = db.relationship("Users", back_populates="users")
-    category = db.relationship("Categories", back_populates="transactions")
-    
+    item = db.relationship("Items", back_populates="transactions")
+
     __table_args__ = (
         CheckConstraint(
             "transaction_type IN ('income', 'expense')", name="check_type_valid"

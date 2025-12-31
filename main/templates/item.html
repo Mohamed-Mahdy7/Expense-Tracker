@@ -1,0 +1,75 @@
+{%extends "index.html"%} {%block title%} Items {%endblock%} {%block header%}
+Items {%endblock%} {%block body%}
+
+<div class="container mt-5">
+  <h2 class="mb-4">Add New Items</h2>
+
+  <!-- Transaction Form -->
+  <form method="POST" action="/items">
+    <div class="mb-3">
+      <label for="item" class="form-label">Item</label>
+      <input type="text" class="form-control" id="item" name="name" required />
+    </div>
+    <div class="mb-3">
+      <label for="price" class="form-label">Price</label>
+      <input
+        type="number"
+        class="form-control"
+        id="price"
+        name="price"
+        required
+      />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add item</button>
+  </form>
+
+  <hr class="my-5" />
+
+  <!-- Transaction List -->
+  <h2 class="mb-4">Your Items</h2>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in items %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.price }}</td>
+        <td>
+          <!-- update -->
+          <a
+            href="{{ url_for('main.item_edit', id=c.id)}}"
+            class="btn btn-sm btn-warning"
+          >
+            Edit
+          </a>
+
+          <form
+            method="post"
+            action="{{ url_for('main.item_edit', id=c.id) }}"
+            style="display: inline"
+          >
+            <input type="hidden" name="_method" value="DELETE" />
+            <button
+              type="submit"
+              class="btn btn-sm btn-danger"
+              onclick="return confirm('Are you sure? This transaction will be deleted!');"
+            >
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{%endblock%}

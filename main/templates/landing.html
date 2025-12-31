@@ -1,17 +1,12 @@
-{%extends 'layout.html'%}
+{%extends 'layout.html'%} {%block title%} Home {%endblock%} {%block header%}
+Expense Tracker {%endblock%} {%block main%}
 
-{%block title%} Home {%endblock%}
-
-{%block header%} Expense Tracker {%endblock%}
-
-{%block main%}
-
-    <section class="text-center py-5 bg-light">
-        <div class="container">
-            <h1 class="display-4">Track Your Expenses Easily</h1>
-            <p class="lead mt-3">Monitor your income and spending in one place.</p>
-            <a href="/register" class="btn btn-primary btn-lg mt-3">Get Started</a>
-            {% with messages = get_flashed_messages(with_categories=true) %} {% endwith %}
-        </div>
-    </section>
+<section class="text-center py-5 bg-light">
+  <div class="container">
+    <h1 class="display-4">Track Your Expenses Easily</h1>
+    <p class="lead mt-3">Monitor your income and spending in one place.</p>
+    <a href="/register" class="btn btn-primary btn-lg mt-3">Get Started</a>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% endwith %}
+  </div>
+</section>
 {%endblock%}

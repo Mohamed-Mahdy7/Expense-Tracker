@@ -1,0 +1,45 @@
+{%extends "index.html"%} {%block title%} item {%endblock%} {%block header%} Edit
+item {%endblock%} {%block body%}
+
+<div class="container mt-5">
+  <h2 class="mb-4">Edit item</h2>
+
+  <!-- Items Form -->
+  <form method="POST" action="{{ url_for('main.item_edit', id=item.id) }}">
+    <input type="hidden" name="_method" value="PUT" />
+
+    <div class="mb-3">
+      <label for="item" class="form-label">Item</label>
+      <input
+        value="{{item.name}}"
+        name="name"
+        title="item"
+        id="name"
+        class="form-control"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="price" class="form-label">Price</label>
+      <input
+        value="{{item.price}}"
+        type="number"
+        class="form-control"
+        id="price"
+        name="price"
+        required
+      />
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-success">Update</button>
+
+      <a href="{{ url_for('main.item_details') }}" class="btn btn-secondary">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+
+{%endblock%}
