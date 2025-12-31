@@ -1,8 +1,10 @@
-from flask import flash, jsonify, current_app, make_response, redirect, render_template, request, url_for
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+from flask import flash, jsonify, current_app, redirect, render_template, request, url_for
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, set_access_cookies, set_refresh_cookies, verify_jwt_in_request
+from flask_jwt_extended.exceptions import NoAuthorizationError
 from werkzeug.security import check_password_hash, generate_password_hash
 from main.models import Users, db
 from datetime import datetime, timezone
+from . import auth
 
 
 def register():
@@ -15,7 +17,7 @@ def register():
             
             if hash != confirm_password:
                 return render_template(
-                "error.html", 
+                "error.html",
                 title = "Register Error",
                 error="Password and Confirmation Password not the same!",
                 back_url=url_for("auth.register_"))
@@ -71,7 +73,6 @@ def login():
         username = data.get("username").strip()
         password = data.get("password").strip()
         
-        
         user = db.session.query(Users).filter(Users.username==username).first()
         if not user:
             current_app.logger.error("User Not Found")
@@ -99,7 +100,6 @@ def login():
             # Create tokens
             access_token = create_access_token(
                 identity=str(user.id),
-                fresh=True,
                 additional_claims=additional_claims
                 )
             refresh_token = create_refresh_token(
@@ -110,18 +110,9 @@ def login():
             response = redirect("/dashboard")
             
             # Set Cookies
-            response.set_cookie(
-                "access_token_cookie", access_token,
-                httponly=True,
-                secure=False,
-                samesite="Lax",
-            )
-            response.set_cookie(
-                "refresh_token_cookie", refresh_token,
-                httponly=True,
-                samesite="Lax",
-                secure=False
-            )
+            set_access_cookies(response, access_token)
+            set_refresh_cookies(response, refresh_token)
+            
             return response
         except Exception as e:
             current_app.logger.error(f"Error Logging in: {str(e)}")
@@ -135,45 +126,40 @@ def login():
         return render_template("login.html")
 
 
-@jwt_required(refresh=True)
 def refresh():
-    """refresh cookies"""
-    identity = get_jwt_identity()
-    new_access_token = create_access_token(identity=identity)
-    
-    response = make_response(jsonify({
-        "message": "Token Refreshed!",
-        "access_token_cookie": new_access_token
-    }), 201)
-    
-    response.set_cookie(
-        "access_token_cookie", new_access_token,
-        httponly=True,
-        secure=False,
-        samesite="Lax",
-    )
-    return response
+    """refresh tokens"""
+    try:
+        identity = get_jwt_identity()
+        new_access_token = create_access_token(identity=identity)
+        
+        response = jsonify({"message": "Token Refreshed!"})
+        set_access_cookies(response, new_access_token)
+        return response
+    except NoAuthorizationError:
+        return jsonify({"msg": "Refresh token is missing or invalid"}), 401
 
 
-@jwt_required()
 def logout():
     if request.method == "POST":
         flash("Logged out successfully", "info")
-        response = redirect(url_for('hello'))
+        response = redirect(url_for('auth.login_'))
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
         response.set_cookie(
-            "access_token", "",
+            "access_token_cookie", "",
             expires=0, 
             httponly=True, 
             samesite="Lax"
             )
         response.set_cookie(
-            "refresh_token", "",
+            "refresh_token_cookie", "",
             expires=0, 
             httponly=True, 
             samesite="Lax")
         return response
     else:
         return render_template(
-                "logout.html", 
-                message=f"Are you sure you want to logout?",
-                back_url=url_for("main.dashboard_"))
+            "logout.html", 
+            message=f"Are you sure you want to logout?",
+            back_url=url_for("main.dashboard_"))

@@ -14,10 +14,25 @@
         <div class="filters">
             <div class="filter">
                 <form method="get" class="filter-form">
-                    <label for="month">Select Month</label>
                     <div class="filter-row">
-                        <input type="month" name="month" id="month" 
-                                value="{{ request.args.get('month', '') }}">
+                        <div class="filter-group">
+                            <label for="from">From</label>
+                            <input
+                                type="date"
+                                name="from"
+                                id="from"
+                                value="{{ request.args.get('from', from_date.strftime('%Y-%m-%d')) }}"
+                            >
+                        </div>
+                        <div class="filter-group">
+                            <label for="to">To</label>
+                            <input
+                                type="date"
+                                name="to"
+                                id="to"
+                                value="{{ request.args.get('to', to_date.strftime('%Y-%m-%d')) }}"
+                            >
+                        </div>
                         <button type="submit">Filter</button>
                     </div>
                 </form>
@@ -28,9 +43,9 @@
                     <label for="type">Select Type</label>
                     <div class="filter-row">
                         <select class="form-select" name="type" id="type" >
-                            <option value="both" {{'selected' if request.args.get('type', 'both')}}>Expenses</option>
-                            <option value="{{ expenses }}">Expenses</option>
-                            <option value="{{ income }}">Income</option>
+                            <option value="both" {{ "selected" if selected_type == "both" else "" }}>Both</option>
+                            <option value="income" {{ "selected" if selected_type == "income" else "" }}>Income</option>
+                            <option value="expense" {{ "selected" if selected_type == "expense" else "" }}>Expenses</option>
                         </select>
                         <button type="submit">Filter</button>
                     </div>
@@ -71,10 +86,10 @@
         </div>
         <div 
             id="chart-data"
-            data-labels='{{ labels | tojson }}'
-            data-values='{{ values | tojson }}'
-            data-income='{{ income }}'
-            data-expenses='{{ expenses }}'>
+            data-pie-labels='{{ pie_labels | default([]) | tojson }}'
+            data-pie-values='{{ pie_values | default([]) | tojson }}'
+            data-bar-labels='{{ bar_labels | default([]) | tojson }}'
+            data-bar-values='{{ bar_values | default([]) | tojson }}'>
         </div>
     </div>
 

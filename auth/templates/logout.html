@@ -15,13 +15,9 @@
                     </div>
                     <div class="card-body">
                         <p class="mb-3">{{ message }}</p>
-                        
-                        <form action="{{ url_for('auth.logout_') }}" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-outline-warning">
-                                Logout
-                            </button>
-                        </form>
-                        
+                        <button id="logoutBtn" type="submit" class="btn btn-outline-warning">
+                            Logout
+                        </button>
                         <a href="{{ back_url }}" class="btn btn-outline-success">
                             Cancel
                         </a>

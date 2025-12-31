@@ -1,8 +1,8 @@
 """Contain dashbord logic"""
 
-from datetime import datetime
-from sqlalchemy import Integer, cast, func
-from flask import current_app, render_template, request
+from datetime import datetime, date
+from sqlalchemy import func
+from flask import render_template, request
 from flask_jwt_extended import get_jwt_identity
 from main.models import Items, Transactions
 from . import db
@@ -10,42 +10,63 @@ from . import db
 
 def dashboard():
     user_id = int(get_jwt_identity())
-    month_str = request.args.get("month")
-    if month_str:
-        year, month = map(int, month_str.split("-"))
+    # Date range 
+    today = date.today()
+    from_date_str = request.args.get("from")
+    to_date_str = request.args.get("to")
+
+    if from_date_str:
+        from_date = datetime.strptime(from_date_str, "%Y-%m-%d").date()
     else:
-        now = datetime.now()
-        month = request.args.get("month", f"{now.month:02}")
-        year = request.args.get("year", str(now.year))
+        from_date = today.replace(day=1)
 
-    # Total income
-    income = (
-        db.session.query(func.coalesce(db.func.sum(Transactions.total), 0))
-        .filter(
-            Transactions.user_id == user_id,
-            Transactions.transaction_type == "income",
-            cast(func.strftime("%Y", Transactions.date), Integer) == year,
-            cast(func.strftime("%m", Transactions.date), Integer) == month,
-        )
-        .scalar()
+    if to_date_str:
+        to_date = datetime.strptime(to_date_str, "%Y-%m-%d").date()
+    else:
+        to_date = today
+    
+    date_filter = (
+        Transactions.date >= from_date,
+        Transactions.date <= to_date
     )
-
-    # Total expenses
-    expenses = (
-        db.session.query(func.coalesce(db.func.sum(Transactions.total), 0))
-        .filter(
-            Transactions.user_id == user_id,
-            Transactions.transaction_type == "expense",
-            cast(func.strftime("%m", Transactions.date), Integer) == month,
-            cast(func.strftime("%Y", Transactions.date), Integer) == year,
+    
+    selected_type = request.args.get("type", "both")
+    
+    income = expenses = 0
+    
+    if selected_type in ("both", "income"):
+    
+        # Total income
+        income = (
+            db.session.query(func.coalesce(db.func.sum(Transactions.total), 0))
+            .filter(
+                Transactions.user_id == user_id,
+                Transactions.transaction_type == "income",
+                *date_filter
+            )
+            .scalar()
         )
-        .scalar()
-    )
+    
+    if selected_type in ("both", "expense"):
+        
+        # Total expenses
+        expenses = (
+            db.session.query(func.coalesce(db.func.sum(Transactions.total), 0))
+            .filter(
+                Transactions.user_id == user_id,
+                Transactions.transaction_type == "expense",
+                *date_filter
+            )
+            .scalar()
+        )
 
     balance = income - expenses
 
     # Pie chart
-    item_data = (
+    pie_labels = []
+    pie_values = []
+    
+    pie_chart = (
         db.session.query(
             Items.name,
             func.coalesce(func.sum(Transactions.amount), 0).label("total"),
@@ -53,22 +74,57 @@ def dashboard():
         .join(Transactions, Items.id == Transactions.item_id)
         .filter(
             Transactions.user_id == user_id,
-            Transactions.transaction_type == "expense",
-            cast(func.strftime("%m", Transactions.date), Integer) == month,
-            cast(func.strftime("%Y", Transactions.date), Integer) == year,
+            *date_filter
+        )
+    )
+    
+    if selected_type != "both":
+        pie_chart = pie_chart.filter(
+        Transactions.transaction_type == selected_type
+    )
+
+    pie_data = pie_chart.group_by(Items.name).all()
+
+    pie_labels = [row[0] for row in pie_data]
+    pie_values = [row[1] for row in pie_data]
+    
+    # Bar Chart
+    bar_labels = []
+    bar_values = []
+
+    if selected_type == "both":
+        bar_labels = ["Income", "Expenses"]
+        bar_values = [income, expenses]
+
+    else:
+        bar_query = (
+        db.session.query(
+            Items.name,
+            func.coalesce(func.sum(Transactions.amount), 0).label("total"),
+        )
+        .join(Transactions, Items.id == Transactions.item_id)
+        .filter(
+            Transactions.user_id == user_id,
+            Transactions.transaction_type == selected_type,
+            *date_filter
         )
         .group_by(Items.name)
         .all()
     )
-
-    labels = [row[0] for row in item_data]
-    values = [row[1] for row in item_data]
+        
+        bar_labels = [row[0] for row in bar_query]
+        bar_values = [row[1] for row in bar_query]
 
     return render_template(
         "dashboard.html",
         income=income,
         expenses=expenses,
         balance=balance,
-        labels=labels,
-        values=values,
+        pie_labels=pie_labels,
+        pie_values=pie_values,
+        bar_labels=bar_labels,
+        bar_values=bar_values,
+        from_date=from_date,
+        to_date=to_date,
+        selected_type=selected_type
     )

@@ -16,11 +16,11 @@ class Config:
     SQLALCHEMY_ECHO = True
     DEBUG = True
     FLASK_JWT_SECRET_KEY = os.getenv("FLASK_JWT_SECRET_KEY")
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=15)
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
-    JWT_TOKEN_LOCATION = ['cookies']
-    JWT_ACCESS_TOKEN_NAME = "access_token_cookie"
-    JWT_REFRESH_TOKEN_NAME = "refresh_token_cookie"
-    JWT_COOKIE_CSRF_PROTECT = False  
+    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_ACCESS_COOKIE_NAME = "access_token_cookie"
+    JWT_REFRESH_COOKIE_NAME = "refresh_token_cookie"
+    JWT_COOKIE_CSRF_PROTECT = False
     JWT_COOKIE_SECURE = False        
     JWT_COOKIE_SAMESITE = "Lax"

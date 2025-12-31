@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from . import auth
 from .authentication import login, refresh, register, logout
 
@@ -14,6 +15,7 @@ def register_():
 def logout_():
     return logout()
 
-@auth.route("/refresh", methods=["POST"])
+@auth.route("/refresh", methods=["GET", "POST"])
+@jwt_required(refresh=True)
 def refresh_():
-    return refresh
+    return refresh()

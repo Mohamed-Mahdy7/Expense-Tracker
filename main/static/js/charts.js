@@ -1,63 +1,41 @@
 document.addEventListener("DOMContentLoaded", function () {
   const dataDiv = document.getElementById("chart-data");
-
   if (!dataDiv) return;
 
-  const labels = JSON.parse(dataDiv.dataset.labels);
-  // const labels = ['income','expenses']
-  // console.log(labels)
-  const values = JSON.parse(dataDiv.dataset.values);
-  // const values = [100,274]
-  const income = Number(dataDiv.dataset.income);
-  const expenses = Number(dataDiv.dataset.expenses);
-  console.log(values);
-  // Pie Chart
-  const pieCtx = document.getElementById("pieChart");
+  // Pie
+  const pieLabels = JSON.parse(dataDiv.dataset.pieLabels);
+  const pieValues = JSON.parse(dataDiv.dataset.pieValues);
 
+  const pieCtx = document.getElementById("pieChart");
   if (pieCtx) {
     new Chart(pieCtx, {
       type: "pie",
       data: {
-        labels: labels,
-        datasets: [
-          {
-            data: values,
-          },
-        ],
-      },
+        labels: pieLabels,
+        datasets: [{ data: pieValues }]
+      }
     });
   }
 
-  // Bar Chart
+  // Bar
+  const barLabels = JSON.parse(dataDiv.dataset.barLabels);
+  const barValues = JSON.parse(dataDiv.dataset.barValues);
+
   const barCtx = document.getElementById("barChart");
-  const data = [
-    { title: "one", value: 100 },
-    { title: "two", value: 200 },
-    { title: "three", value: 140 },
-    { title: "four", value: 300 },
-  ];
-  const barChartLabels = data.map((item) => item.title);
-  const barChartValue = data.map((item) => item.value);
   if (barCtx) {
     new Chart(barCtx, {
       type: "bar",
       data: {
-        labels: barChartLabels,
-        datasets: [
-          {
-            label: "Amount",
-            data: barChartValue,
-          },
-        ],
+        labels: barLabels,
+        datasets: [{
+          label: "Amount",
+          data: barValues
+        }]
       },
       options: {
         responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
+        scales: { y: { beginAtZero: true } }
+      }
     });
   }
 });

@@ -1,4 +1,3 @@
-from enum import unique
 from sqlalchemy import CheckConstraint, ForeignKey
 from . import db
 
