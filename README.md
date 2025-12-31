@@ -3,7 +3,7 @@
 A full‑stack **Expense Tracker Web Application** built with **Flask** as a **CS50x Final Project**. The app allows users to manage items, record transactions, and track income vs expenses through a clean dashboard with charts.
 
 ---
-
+#### Video Demo:  <https://youtu.be/Gz2Ip4Sp3WA>
 ## Project Overview
 
 This project was developed as the **final project for Harvard CS50x**. It demonstrates:

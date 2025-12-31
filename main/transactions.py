@@ -62,8 +62,10 @@ def get_transaction():
 def get_one_transaction(id):
     """GET one transaction record"""
     transaction = Transactions.query.get_or_404(id)
-    items = Items.query.all()
     user_id = int(get_jwt_identity())
+    items = (
+        db.session.query(Items).filter_by(user_id=user_id).order_by(Items.name).all()
+    )
 
     if transaction.user_id != user_id:
         current_app.logger.warning(
